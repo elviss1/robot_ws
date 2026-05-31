@@ -1,0 +1,33 @@
+running egg_info
+creating ../../build/lidar_reader/lidar_reader.egg-info
+writing ../../build/lidar_reader/lidar_reader.egg-info/PKG-INFO
+writing dependency_links to ../../build/lidar_reader/lidar_reader.egg-info/dependency_links.txt
+writing requirements to ../../build/lidar_reader/lidar_reader.egg-info/requires.txt
+writing top-level names to ../../build/lidar_reader/lidar_reader.egg-info/top_level.txt
+writing manifest file '../../build/lidar_reader/lidar_reader.egg-info/SOURCES.txt'
+reading manifest file '../../build/lidar_reader/lidar_reader.egg-info/SOURCES.txt'
+writing manifest file '../../build/lidar_reader/lidar_reader.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/ubunturse/robot_ws/build/lidar_reader/build
+creating /home/ubunturse/robot_ws/build/lidar_reader/build/lib
+creating /home/ubunturse/robot_ws/build/lidar_reader/build/lib/lidar_reader
+copying lidar_reader/lidar_reader.py -> /home/ubunturse/robot_ws/build/lidar_reader/build/lib/lidar_reader
+copying lidar_reader/__init__.py -> /home/ubunturse/robot_ws/build/lidar_reader/build/lib/lidar_reader
+running install
+running install_lib
+creating /home/ubunturse/robot_ws/install/lidar_reader/lib/python3.12/site-packages/lidar_reader
+copying /home/ubunturse/robot_ws/build/lidar_reader/build/lib/lidar_reader/lidar_reader.py -> /home/ubunturse/robot_ws/install/lidar_reader/lib/python3.12/site-packages/lidar_reader
+copying /home/ubunturse/robot_ws/build/lidar_reader/build/lib/lidar_reader/__init__.py -> /home/ubunturse/robot_ws/install/lidar_reader/lib/python3.12/site-packages/lidar_reader
+byte-compiling /home/ubunturse/robot_ws/install/lidar_reader/lib/python3.12/site-packages/lidar_reader/lidar_reader.py to lidar_reader.cpython-312.pyc
+byte-compiling /home/ubunturse/robot_ws/install/lidar_reader/lib/python3.12/site-packages/lidar_reader/__init__.py to __init__.cpython-312.pyc
+running install_data
+creating /home/ubunturse/robot_ws/install/lidar_reader/share/ament_index
+creating /home/ubunturse/robot_ws/install/lidar_reader/share/ament_index/resource_index
+creating /home/ubunturse/robot_ws/install/lidar_reader/share/ament_index/resource_index/packages
+copying resource/lidar_reader -> /home/ubunturse/robot_ws/install/lidar_reader/share/ament_index/resource_index/packages
+copying package.xml -> /home/ubunturse/robot_ws/install/lidar_reader/share/lidar_reader
+running install_egg_info
+Copying ../../build/lidar_reader/lidar_reader.egg-info to /home/ubunturse/robot_ws/install/lidar_reader/lib/python3.12/site-packages/lidar_reader-0.0.0-py3.12.egg-info
+running install_scripts
+writing list of installed files to '/home/ubunturse/robot_ws/build/lidar_reader/install.log'
