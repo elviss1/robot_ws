@@ -1,10 +1,9 @@
 build/
 install/
-logs/
+log/
 
 *.pyc
 __pycache__/
 
 .vscode/
-
 .env
