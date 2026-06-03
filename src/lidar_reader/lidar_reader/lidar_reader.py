@@ -37,18 +37,29 @@ class LidarReader(Node):
                 msg.angle_min
                 + nearest_index * msg.angle_increment
             )
+            cmd_msg = TwistStamped()
+
             if nearest < 0.75:
 
-                stop_msg = TwistStamped()
 
-                stop_msg.twist.linear.x = 0.0
-                stop_msg.twist.angular.z = 0.0
+                cmd_msg.twist.linear.x = 0.0
+                cmd_msg.twist.angular.z = 0.5
 
-                self.publisher.publish(stop_msg)
+                self.publisher.publish(cmd_msg)
 
                 self.get_logger().info(
-                    'Obstacle detected! STOP command sent'
+                    'Obstacle detected! TURN command sent'
                 )
+
+            else:
+                cmd_msg.twist.linear.x = 0.3
+                cmd_msg.twist.angular.z = 0.0                         
+
+                self.get_logger().info(
+                    'No obstacle detected. Proceeding forward'
+
+                )
+
 
             self.get_logger().info(
                 f'Nearest obstacle: {nearest:.2f} m, '
