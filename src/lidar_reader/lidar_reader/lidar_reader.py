@@ -40,15 +40,18 @@ class LidarReader(Node):
             cmd_msg = TwistStamped()
 
             if nearest < 0.75:
-
-
                 cmd_msg.twist.linear.x = 0.0
-                cmd_msg.twist.angular.z = 0.5
+                if angle < math.pi:
+                    cmd_msg.twist.angular.z = -0.5
+                    turn_direction = "right"
 
-                self.publisher.publish(cmd_msg)
+                else: 
+                    cmd_msg.twist.angular.z = 0.5
+                    turn_direction = "left"
 
+                           
                 self.get_logger().info(
-                    'Obstacle detected! TURN command sent'
+                    f'Obstacle detected at angle {angle: .2f} rad. Turning {turn_direction}.'
                 )
 
             else:
