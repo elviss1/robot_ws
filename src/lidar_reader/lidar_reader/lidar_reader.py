@@ -22,6 +22,8 @@ class LidarReader(Node):
             10    
         )
 
+        self.obstacle_count = 0
+
     def scan_callback(self, msg):
 
         valid_ranges = [
@@ -40,7 +42,13 @@ class LidarReader(Node):
             cmd_msg = TwistStamped()
 
             if nearest < 0.75:
+                self.obstacle_count += 1
+            else:
+                self.obstacle_count = 0
+            
+            if self.obstacle_count >= 3:
                 cmd_msg.twist.linear.x = 0.0
+
                 if angle < math.pi:
                     cmd_msg.twist.angular.z = -0.5
                     turn_direction = "right"
@@ -51,7 +59,7 @@ class LidarReader(Node):
 
                            
                 self.get_logger().info(
-                    f'Obstacle detected at angle {angle: .2f} rad. Turning {turn_direction}.'
+                    f'Obstacle detected at angle {angle:.2f} rad. Turning {turn_direction}.'
                 )
 
             else:
@@ -63,7 +71,7 @@ class LidarReader(Node):
 
                 )
 
-
+            self.publisher.publish(cmd_msg)
             self.get_logger().info(
                 f'Nearest obstacle: {nearest:.2f} m, '
                 f'Beam Index: {nearest_index}, '
