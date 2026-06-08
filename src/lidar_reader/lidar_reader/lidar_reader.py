@@ -24,21 +24,65 @@ class LidarReader(Node):
 
         self.obstacle_count = 0
 
+    def perceive(self,msg):
+        valid_ranges =[
+            r for r in msg.ranges 
+            if r > 0 and
+            math.isfinite(r)
+            ]
+        if len(valid_ranges) == 0:
+            return None, None, None
+        
+        nearest = min(valid_ranges)
+        nearest_index = msg.ranges.index(nearest)
+        angle = (
+            msg.angle_min + 
+            nearest_index * msg.angle_increment
+                 )
+        return nearest, nearest_index, angle
+    
+    def decide(self, nearest, angle):
+
+        if nearest < 0.75:
+            self.obstacle_count += 1
+        else:
+            self.obstacle_count = 0
+
+        if self.obstacle_count >= 3:
+
+            if angle < math.pi:
+                return 0.0, -0.5
+            else:
+                return 0.0, 0.5
+
+        return 0.3, 0.0
+    
+    def act(self, linear, angular):
+
+        cmd_msg = TwistStamped()
+
+        cmd_msg.twist.linear.x = linear
+        cmd_msg.twist.angular.z = angular
+
+        self.publisher.publish(cmd_msg)
+
     def scan_callback(self, msg):
 
-        valid_ranges = [
-            r for r in msg.ranges
-            if r > 0.0 and math.isfinite(r)
-        ]
-                                                                                                        
-        if len(valid_ranges) > 0:
-            nearest = min(valid_ranges)
-            nearest_index = msg.ranges.index(nearest)
+            nearest, nearest_index, angle = self.perceive(msg)
+            if nearest is None:
+                return
+            
+            linear, angular = self.decide(nearest, angle)
 
-            angle = (
-                msg.angle_min
-                + nearest_index * msg.angle_increment
-            )
+            self.act(linear, angular)
+
+            self.get_logger().info(
+                f'Nearest obstacle: {nearest:.2f} m, '
+                f'Beam Index: {nearest_index}, '
+                f'Angle: {angle:.2f} rad, '
+                f'Linear: {linear:.2f}, '
+                f'Angular: {angular:.2f}'
+    )
             cmd_msg = TwistStamped()
 
             if nearest < 0.75:
