@@ -29,3 +29,20 @@ Learned:
 ✓ Separation of concerns
 ✓ Architecture emerges after building
 ✓ Don't solve the project, solve the next problem
+
+
+
+2026-06-08
+Day 9: First Vision Node
+
+Built:
+✓ Switched to waffle_pi
+✓ Camera topic discovered
+✓ Subscribed to /camera/image_raw
+✓ Created robot_vision package
+
+Learned:
+✓ Image is the camera equivalent of LaserScan
+✓ Sensors follow the same ROS pattern
+✓ Camera publishes sensor_msgs/msg/Image
+✓ Width and height represent image resolution
