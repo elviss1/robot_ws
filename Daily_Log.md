@@ -46,3 +46,46 @@ Learned:
 ✓ Sensors follow the same ROS pattern
 ✓ Camera publishes sensor_msgs/msg/Image
 ✓ Width and height represent image resolution
+
+
+2026-06-16
+Day 10-11: First Vision Node
+Camera
+↓
+ROS Image
+↓
+OpenCV Image
+↓
+Average BGR
+↓
+Dominant Color
+↓
+Decision
+↓
+Motion Command
+
+✓ Camera subscriber
+✓ ROS Image → OpenCV conversion
+✓ Average BGR extraction
+✓ Dominant color detection
+✓ Vision-based decision
+✓ Vision-based actuation
+
+Pipeline:
+
+Perceive
+↓
+Camera
+↓
+Dominant color
+
+Decide
+↓
+Choose velocities
+
+Act
+↓
+Publish /cmd_vel
+
+2026-06-16
+Day 12: 
