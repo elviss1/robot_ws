@@ -2,7 +2,8 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import TwistStamped
-from cv_bridge import CvBridge                                                                                                                                                               
+from cv_bridge import CvBridge    
+import cv2                                                                                                                                                           
 
 
 class VisionNode(Node):
@@ -25,44 +26,93 @@ class VisionNode(Node):
         self.bridge = CvBridge()
 
     def image_callback(self, msg):
+
         cv_image = self.bridge.imgmsg_to_cv2(
             msg,
             desired_encoding='bgr8'
-)
+        )
+
+        hsv_image = cv2.cvtColor(
+            cv_image,
+            cv2.COLOR_BGR2HSV
+        )
+
+        lower_green = (40, 50, 50)
+        upper_green = (80, 255, 255)
+
+        green_mask = cv2.inRange(
+            hsv_image,
+            lower_green,
+            upper_green
+        )
+
+        height, width = green_mask.shape
+        third = width // 3
+
+        left_region = green_mask[:, :third]
+        center_region = green_mask[:, third:2 * third]
+        right_region = green_mask[:, 2 * third:]
+
+        left_count = cv2.countNonZero(left_region)
+        center_count = cv2.countNonZero(center_region)
+        right_count = cv2.countNonZero(right_region)
         centre_y = cv_image.shape[0] // 2
         centre_x = cv_image.shape[1] // 2
 
         centre_pixel = cv_image[centre_y, centre_x]
 
-        mean_bgr = cv_image.mean(axis=(0, 1))
 
-        blue = mean_bgr[0]
-        green = mean_bgr[1]
-        red = mean_bgr[2]
-        if green > blue and green > red:
-            dominant_color = "green"
-        elif blue > green and blue > red:
-            dominant_color = "blue"
-        else:
-            dominant_color = "red/other"
+        target_region = self.find_target_region(
+            left_count,
+            center_count,
+            right_count
+        )
+        linear, angular = self.decide(target_region)
 
-        linear, angular = self.decide(dominant_color)
         self.act(linear, angular)
-        
+
         self.get_logger().info(
-            f'Blue: {blue:.1f}, '
-            f'Green: {green:.1f}, '
-            f'Red: {red:.1f}, '
-            f'Dominant: {dominant_color}, '
+            f'Center pixel BGR: {centre_pixel}, '
+            f'Image shape: {cv_image.shape}, '
+            f'Mask shape: {green_mask.shape}, '
+            f'Left: {left_count}, '
+            f'Center: {center_count}, '
+            f'Right: {right_count}, '
+            f'Target: {target_region}, '
             f'Linear: {linear:.1f}, '
             f'Angular: {angular:.1f}'
-)
         
+)
 
-    def decide(self, dominant_color):
-        if dominant_color == 'green':
-            return 0.1, 0.2
-        return 0.0,0.0
+    def find_target_region(self, left_count, center_count, right_count):
+
+        if left_count == 0 and center_count == 0 and right_count == 0:
+            return "none"
+
+        if left_count > center_count and left_count > right_count:
+            return "left"
+
+        if center_count > left_count and center_count > right_count:
+            return "center"
+
+        if right_count > left_count and right_count > center_count:
+            return "right"
+
+        return "none"
+     
+
+    def decide(self, target_region):
+
+        if target_region == "left":
+            return 0.0, 1.0
+
+        if target_region == "center":
+            return 0.3, 0.0
+
+        if target_region == "right":
+            return 0.0, -1.0
+
+        return 0.0, 0.0
     
     def act(self, linear, angular):
         cmd_msg = TwistStamped()
