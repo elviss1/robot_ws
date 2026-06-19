@@ -1,3 +1,155 @@
+Phase 1: Foundations
+--------------------
+Perceive
+Decide
+Act
+
+Phase 2: Domain Sampling
+------------------------
+Perception
+✓
+
+Navigation
+NEXT
+
+Manipulation
+
+Planning
+
+Systems
+
+Phase 3: Choose 1-2 Domains
+------------------------
+Phase 4: Deep Projects
+------------------------
+Phase 5: Hardware
+------------------------
+
+
+Checkpoints For The Roadmap
+This is more important than the timeline itself.
+
+Phase 1 — Foundations
+Goal:
+Understand robot architecture.
+Checkpoint:
+Can you explain from memory:
+Sensor
+↓
+Perceive
+↓
+Decide
+↓
+Act
+
+Can you build:
+Subscriber
+↓
+Logic
+↓
+Publisher
+without looking at notes?
+If yes:
+Pass.
+
+Phase 2 — Domain Sampling
+Goal:
+Touch the major domains.
+Checkpoint:
+Could you explain to a beginner:
+Perception
+
+Navigation
+
+Manipulation
+
+Planning
+
+Systems
+in plain English?
+Could you build a tiny project in each?
+If yes:
+Pass.
+
+Phase 3 — Domain Selection
+Goal:
+Choose 1-2 domains.
+Checkpoint:
+Can you answer:
+What am I best at?
+What do I enjoy?
+What does industry need?
+If you cannot answer all three:
+Don't specialize yet.
+
+Phase 4 — Deep Projects
+Goal:
+Build portfolio-worthy work.
+Checkpoint:
+Could a recruiter spend 5 minutes on your GitHub and say:
+This person can build robots.
+If not:
+Project isn't deep enough.
+
+Phase 5 — First Job Readiness
+[certain]
+This is the real checkpoint.
+Not:
+Did I finish the roadmap?
+But:
+
+Can I sit in a robotics team's standup
+and understand the conversation?
+Topics mentioned:
+
+ROS
+
+Topics
+
+Nodes
+
+Sensors
+
+Localization
+
+Navigation
+
+Transforms
+
+Control
+
+Simulation
+
+If those are familiar rather than intimidating:
+You're close.
+
+My current assessment:
+
+Phase 1:
+~90-95% complete
+
+Job readiness:
+~10-15%
+
+Reason:
+You understand architecture now.
+
+You do not yet understand navigation,
+localization,
+planning,
+deployment,
+or hardware integration.
+
+That's not a criticism.
+
+That's actually good news.
+
+The hardest part for most beginners is reaching the point where robotics stops looking like magic.
+
+You're crossing that boundary now. The next domains build on the same mental model rather than replacing it.
+
+
+
 2026-06-06
 
 Day 7: Add obstacle confirmation filter
@@ -84,6 +236,22 @@ Decide
 Choose velocities
 
 Act
+
+
+2026-06-18
+Day 13 Artifact
+
+Image
+↓
+HSV
+↓
+Mask
+↓
+Left / Center / Right
+↓
+Target Region
+↓
+Motion Command
 ↓
 Publish /cmd_vel
 
