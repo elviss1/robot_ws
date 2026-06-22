@@ -255,5 +255,56 @@ Motion Command
 ↓
 Publish /cmd_vel
 
-2026-06-16
-Day 12: 
+
+
+2026-06-19
+Day 14 – Navigation: Odometry and Robot State
+
+Built an odometry reader node.
+
+Key concepts:
+- Odometry
+- Position
+- Velocity
+- Reference frames
+
+Key takeaway:
+Odometry describes where the robot is and how it is moving relative to a reference frame.
+
+Can inspect ROS message definitions and extract useful fields independently.
+
+
+
+2026-06-20
+Day 15 – Navigation: Pose Tracking
+
+Built an odometry-based pose tracker.
+
+Key concepts:
+- Position (x, y)
+- Orientation (quaternion)
+- Yaw (human-readable heading)
+
+Key takeaway:
+Pose = Position + Orientation
+
+Can interpret robot heading and describe robot state relative to the odom frame.
+
+
+
+
+2026-06-21
+Day 16 – Navigation: Motion and Pose Evolution
+
+Observed how velocity commands affect robot pose over time.
+
+Key concepts:
+- Linear velocity
+- Angular velocity
+- Pose evolution
+
+Key takeaway:
+Translation changes position.
+Rotation changes orientation.
+
+Can interpret odometry changes as physical robot movement.
