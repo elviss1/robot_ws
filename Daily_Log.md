@@ -308,3 +308,20 @@ Translation changes position.
 Rotation changes orientation.
 
 Can interpret odometry changes as physical robot movement.
+
+
+
+2026-06-22
+Day 17 – Navigation: Distance-Based Motion
+
+Built a distance driver using odometry.
+
+Key concepts:
+- Distance traveled
+- Goal condition
+- State-based decision making
+
+Key takeaway:
+Navigation behaviors can be driven by robot state rather than direct sensor reactions.
+
+Can command the robot to move a target distance and stop automatically.
