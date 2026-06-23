@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': ['odom_reader = robot_navigation.odom_reader:main',
+                            'distance_driver = robot_navigation.distance_driver:main',
         ],
     },
 )
