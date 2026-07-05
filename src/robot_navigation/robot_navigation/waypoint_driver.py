@@ -5,12 +5,16 @@ from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TwistStamped
 
+
 class WaypointDriver(Node):
     def __init__(self):
         super().__init__('waypoint_driver')
-        self.target_x = 2.0
-        self.target_y = 1.0
-        self.tolerance = 0.1
+
+        self.waypoints = [(2.0,2.0), (3.1,3.1), (4.5, 3.9)]
+        self.current_waypoints = 0
+        self.distance_tolerance = 0.1
+        self.heading_tolerance = 0.1
+        
 
         self.subscription = self.create_subscription(
             Odometry, 
@@ -25,33 +29,73 @@ class WaypointDriver(Node):
             10
         )
 
+    def normalize_angle(self,angle):
+        while angle > math.pi:
+            angle -= 2.0 * math.pi
+        while angle < -math.pi:
+            angle += 2.0 * math.pi
+        return angle
+    
     def odom_callback(self, msg):
         
         current_x = msg.pose.pose.position.x
         current_y = msg.pose.pose.position.y
 
-        dx = current_x - self.target_x
-        dy = current_y - self.target_y
+        qx = msg.pose.pose.orientation.x
+        qy = msg.pose.pose.orientation.y
+        qz = msg.pose.pose.orientation.z
+        qw = msg.pose.pose.orientation.w
 
-        distance_to_target = math.sqrt(dx * dx + dy * dy)
+        current_yaw = math.atan2(
+            2.0 * (qw * qz + qx * qy),
+            1.0 - 2.0 * (qy * qy + qz * qz)
+        )
+        target_x, target_y = self.waypoints[self.current_waypoints]
+
+        dx = target_x - current_x
+        dy = target_y - current_y 
+
+        distance_to_goal = math.sqrt(dx * dx + dy * dy)
+        desired_heading = math.atan2(dy,dx)
+        heading_error = self.normalize_angle(desired_heading - current_yaw)
 
         cmd_msg = TwistStamped()
+        status = "unknown"
 
-        if distance_to_target > self.tolerance:
-            cmd_msg.twist.linear.x = 0.2
-            cmd_msg.twist.angular.z = 0.0
-            status = "driving"
-        else:
+        if distance_to_goal <= self.distance_tolerance:
+            if self.current_waypoints == 2:
+                cmd_msg.twist.linear.x = 0.0
+                cmd_msg.twist.angular.z = 0.0
+                status = "stopped"
+            else:
+                self.current_waypoints += 1
+                status = "next_waypoint"
+
+        elif abs(heading_error) > self.heading_tolerance:
             cmd_msg.twist.linear.x = 0.0
-            cmd_msg.twist.angular.z = 0.0
-            status = "stopped"
+
+            if heading_error > 0:
+                cmd_msg.twist.angular.z = 0.4
+            else:
+                cmd_msg.twist.angular.z = -0.4
+
+            status = "rotating"
+
+        else:
+            gain = 0.5
+            cmd_msg.twist.linear.x = 0.2
+            cmd_msg.twist.angular.z = gain * heading_error
+            status = "driving_correcting"
 
         self.publisher.publish(cmd_msg)
 
         self.get_logger().info(
             f'current: ({current_x:.2f}, {current_y:.2f}), '
-            f'target: ({self.target_x:.2f}, {self.target_y:.2f}), '
-            f'distance_to_target: {distance_to_target:.2f} m, '
+            f'target: ({target_x:.2f}, {target_y:.2f}), '
+            f'distance: {distance_to_goal:.2f}, '
+            f'yaw: {current_yaw:.2f}, '
+            f'desired: {desired_heading:.2f}, '
+            f'error: {heading_error:.2f}, '
             f'status: {status}'
         )
 
