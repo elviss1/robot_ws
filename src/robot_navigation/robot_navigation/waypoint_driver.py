@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TwistStamped
+from sensor_msgs.msg import LaserScan
 
 
 class WaypointDriver(Node):
@@ -14,7 +15,15 @@ class WaypointDriver(Node):
         self.current_waypoints = 0
         self.distance_tolerance = 0.1
         self.heading_tolerance = 0.1
-        
+        self.closest_obstacle_distance = float("inf")
+        self.safety_distance = 0.5
+
+        self.scan_subscription = self.create_subscription(
+            LaserScan,
+            '/scan',
+            self.scan_callback,
+            10
+        )
 
         self.subscription = self.create_subscription(
             Odometry, 
@@ -28,6 +37,25 @@ class WaypointDriver(Node):
             '/cmd_vel',
             10
         )
+
+
+    def scan_callback(self, msg):
+        front_angle = math.radians(30)
+
+        front_ranges = []
+
+        for i, r in enumerate(msg.ranges):
+            angle = msg.angle_min + i *msg.angle_increment
+
+            if -front_angle <= angle <= front_angle:
+                if msg.range_min <= r <= msg.range_max:
+                    front_ranges.append(r)
+        ranges = list(msg.ranges)
+
+        if front_ranges:
+            self.closest_obstacle_distance = min(front_ranges)
+        else:
+            self.closest_obstacle_distance = float("inf")
 
     def normalize_angle(self,angle):
         while angle > math.pi:
@@ -71,6 +99,11 @@ class WaypointDriver(Node):
                 self.current_waypoints += 1
                 status = "next_waypoint"
 
+        elif self.closest_obstacle_distance < self.safety_distance:
+            cmd_msg.twist.linear.x = 0.0
+            cmd_msg.twist.angular.z = 0.0
+            status = "blocked_by_obstacle"
+    
         elif abs(heading_error) > self.heading_tolerance:
             cmd_msg.twist.linear.x = 0.0
 
@@ -97,6 +130,7 @@ class WaypointDriver(Node):
             f'desired: {desired_heading:.2f}, '
             f'error: {heading_error:.2f}, '
             f'status: {status}'
+            f'obstacle: {self.closest_obstacle_distance:.2f}, '
         )
 
 
