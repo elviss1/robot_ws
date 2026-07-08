@@ -325,3 +325,25 @@ Key takeaway:
 Navigation behaviors can be driven by robot state rather than direct sensor reactions.
 
 Can command the robot to move a target distance and stop automatically.
+
+
+
+2026-07-07
+Day 23
+Problem:
+Nested controller logic was getting hard to reason about.
+
+Artifact:
+FSM waypoint driver
+
+Concepts:
+State
+Transition
+Choose state → execute state
+
+Procedure:
+Compute robot info
+↓
+Choose exactly one state
+↓
+Execute action for that state
