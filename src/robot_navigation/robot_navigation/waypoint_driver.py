@@ -40,24 +40,58 @@ class WaypointDriver(Node):
             10
         )
 
+#This below callback was used for inityal obstacle avoidance, where the robot sdaw an obstacle and just stopped
+    # def scan_callback(self, msg):
+    #     front_angle = math.radians(30)
+
+    #     front_ranges = []
+
+    #     for i, r in enumerate(msg.ranges):
+    #         angle = msg.angle_min + i *msg.angle_increment
+
+    #         if -front_angle <= angle <= front_angle:
+    #             if msg.range_min <= r <= msg.range_max:
+    #                 front_ranges.append(r)
+    #     ranges = list(msg.ranges)
+
+    #     if front_ranges:
+    #         self.closest_obstacle_distance = min(front_ranges)
+    #     else:
+    #         self.closest_obstacle_distance = float("inf")
 
     def scan_callback(self, msg):
-        front_angle = math.radians(30)
-
         front_ranges = []
+        left_ranges = []
+        right_ranges = []
 
         for i, r in enumerate(msg.ranges):
-            angle = msg.angle_min + i *msg.angle_increment
+            angle = msg.angle_min + i * msg.angle_increment
 
-            if -front_angle <= angle <= front_angle:
-                if msg.range_min <= r <= msg.range_max:
-                    front_ranges.append(r)
-        ranges = list(msg.ranges)
+            if not (msg.range_min <= r <= msg.range_max):
+                continue
 
-        if front_ranges:
-            self.closest_obstacle_distance = min(front_ranges)
-        else:
-            self.closest_obstacle_distance = float("inf")
+            if math.radians(-30) <= angle <= math.radians(30):
+                front_ranges.append(r)
+
+            elif math.radians(30) < angle <= math.radians(90):
+                left_ranges.append(r)
+
+            elif math.radians(-90) <= angle < math.radians(-30):
+                right_ranges.append(r)
+
+        self.closest_obstacle_distance = (
+            min(front_ranges) if front_ranges else float("inf")
+        )
+
+        self.left_clearance = (
+            min(left_ranges) if left_ranges else float("inf")
+        )
+
+        self.right_clearance = (
+            min(right_ranges) if right_ranges else float("inf")
+        )
+#Above callback was used to divide the robot vision into 2 more sides to be able to actually react when it sees an obstacle
+
 
     def normalize_angle(self,angle):
         while angle > math.pi:
@@ -122,15 +156,18 @@ class WaypointDriver(Node):
 
         elif self.state == "BLOCKED":
             cmd_msg.twist.linear.x = 0.0
-            cmd_msg.twist.angular.z = 0.0
+            if self.left_clearance > self.right_clearance:
+                cmd_msg.twist.angular.z = 0.4
+            else:
+                cmd_msg.twist.angular.z = -0.4
 
         elif self.state == "ROTATING":
             cmd_msg.twist.linear.x = 0.0
 
             if heading_error > 0:
-                cmd_msg.twist.angular.z = 0.4
+                cmd_msg.twist.angular.z = 0.25
             else:
-                cmd_msg.twist.angular.z = -0.4
+                cmd_msg.twist.angular.z = -0.25
 
         elif self.state == "DRIVING":
             gain = 0.5
@@ -179,6 +216,9 @@ class WaypointDriver(Node):
             f'error: {heading_error:.2f}, '
             f'state: {self.state}, '
             f'obstacle: {self.closest_obstacle_distance:.2f}, '
+            f'front: {self.closest_obstacle_distance:.2f}, '
+            f'left: {self.left_clearance:.2f}, '
+            f'right: {self.right_clearance:.2f}, '
         )
 
 
